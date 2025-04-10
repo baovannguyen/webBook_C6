@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsmC6_API", "AsmC6_API\AsmC6_API.csproj", "{64B36A63-E6AF-4DA8-B010-48F8B35F1B12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asm_Blazor", "Asm_Blazor\Asm_Blazor.csproj", "{9F8B3537-C055-4C06-AF2D-4AA792E63E52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64B36A63-E6AF-4DA8-B010-48F8B35F1B12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64B36A63-E6AF-4DA8-B010-48F8B35F1B12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64B36A63-E6AF-4DA8-B010-48F8B35F1B12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64B36A63-E6AF-4DA8-B010-48F8B35F1B12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F8B3537-C055-4C06-AF2D-4AA792E63E52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F8B3537-C055-4C06-AF2D-4AA792E63E52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F8B3537-C055-4C06-AF2D-4AA792E63E52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F8B3537-C055-4C06-AF2D-4AA792E63E52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7F91F6B-5B4C-479B-A07E-C72BC4E412EC}
+	EndGlobalSection
+EndGlobal
