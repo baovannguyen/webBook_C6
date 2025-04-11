@@ -4,6 +4,7 @@ using AsmC6_API.DTOs.NewFolder;
 using AsmC6_API.DTOs.category;
 using AsmC6_API.DTOs.order;
 using AsmC6_API.DTOs.user;
+using AsmC6_API.DTOs.book;
 
 namespace AsmC6_API.DTOs
 {
@@ -14,7 +15,9 @@ namespace AsmC6_API.DTOs
 			CreateMap<BookModel, BookDto>().ReverseMap();
 			CreateMap<BookCreateDto, BookModel>();
 			CreateMap<BookUpdateDto, BookModel>();
-
+			CreateMap<BookModel, BookGetUpdateDto>();
+			CreateMap<BookModel, BookDto>()
+	.ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
 
 			CreateMap<CategoryModel, CategoryDto>().ReverseMap();
 

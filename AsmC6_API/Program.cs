@@ -3,8 +3,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowBlazorClient",
+		policy => policy
+			.WithOrigins("https://localhost:7107") // ??a ch? Blazor WebAssembly
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+			.AllowCredentials()
+	);
+});
 
 // Add services to the container.
 
@@ -42,19 +53,16 @@ builder.Services.AddControllers()
 	.AddJsonOptions(options =>
 	{
 		options.JsonSerializerOptions.ReferenceHandler = null;
-		options.JsonSerializerOptions.WriteIndented = true; 
+		options.JsonSerializerOptions.WriteIndented = true;
+		options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+		options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+		options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 	});
 
-builder.Services.AddControllers()
-	.AddJsonOptions(x =>
-	{
-		x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-		x.JsonSerializerOptions.WriteIndented = true;
-	});
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
+app.UseCors("AllowBlazorClient");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

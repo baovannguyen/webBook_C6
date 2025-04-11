@@ -1,7 +1,39 @@
 ﻿@page "/"
+@using Asm_Blazor.Models;
+@using Asm_Blazor.Models.book
+@inject HttpClient Http
 
-<PageTitle>Home</PageTitle>
+<h3>Sách mới nhất</h3>
 
-<h1>Hello, world!</h1>
+@if (books == null)
+{
+    <p>Đang tải...</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var book in books)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="img/@book.ImageUrl" class="card-img-top" />
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <p class="card-text">Tác giả: @book.Author</p>
+                        <p class="card-text">Thể loại: @book.CategoryName</p>
+                        <p class="card-text text-danger">@book.Price.ToString("N0") ₫</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
 
-Welcome to your new app.
+@code {
+    private List<BookModel> books;
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await Http.GetFromJsonAsync<List<BookModel>>("https://localhost:7197/api/Book");
+    }
+}

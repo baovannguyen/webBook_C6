@@ -1,0 +1,79 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject Asm_Blazor.Services.AuthService AuthService
+
+<h3>Đăng nhập</h3>
+
+<EditForm Model="model" OnValidSubmit="Login1">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputText @bind-Value="model.Username" placeholder="Username" class="form-control mb-2" />
+    <InputText @bind-Value="model.Password" placeholder="Mật khẩu" type="password" class="form-control mb-2" />
+    <button class="btn btn-primary">Đăng nhập</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-2">@errorMessage</div>
+}
+
+@code {
+    private LoginModel model = new();
+    private string? errorMessage;
+
+    public class LoginModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class LoginResponse
+    {
+        public string token { get; set; } = string.Empty;
+        public string role { get; set; } = string.Empty;
+    }
+
+    private async Task Login1()
+    {
+        errorMessage = null;
+
+        try
+        {
+            var res = await Http.PostAsJsonAsync("api/Auth/login", model);
+            if (res.IsSuccessStatusCode)
+            {
+                var loginRes = await res.Content.ReadFromJsonAsync<LoginResponse>();
+
+                await LocalStorage.SetItemAsync("authToken", loginRes.token);
+             
+                await LocalStorage.SetItemAsync("username", model.Username);
+                await LocalStorage.SetItemAsync("role", loginRes.role);
+
+                Http.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", loginRes.token);
+
+                await AuthService.CheckLoginStateAsync();
+
+          
+                if (loginRes.role == "Admin" || loginRes.role == "Staff")
+                {
+                    Nav.NavigateTo("/admin/dashboard");
+                }
+                else
+                {
+                    Nav.NavigateTo("/");
+                }
+            }
+            else
+            {
+                errorMessage = "Sai tài khoản hoặc mật khẩu!";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Lỗi khi đăng nhập: " + ex.Message;
+        }
+    }
+}

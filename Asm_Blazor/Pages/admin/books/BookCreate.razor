@@ -1,0 +1,46 @@
+﻿@page "/admin/books/create"
+@inject Asm_Blazor.Services.BookService BookService
+@inject NavigationManager Navigation
+@using Asm_Blazor.Models.book;
+@inject IJSRuntime JS
+<h3>➕ Thêm Sách</h3>
+
+<form>
+    <input class="form-control mb-2" @bind="book.Title" placeholder="Tiêu đề" />
+    <input class="form-control mb-2" @bind="book.Author" placeholder="Tác giả" />
+    <input class="form-control mb-2" @bind="book.CategoryId" placeholder="Thể Loại" />
+    <input type="number" class="form-control mb-2" @bind="book.Price" placeholder="Giá" />
+    <input type="number" class="form-control mb-2" @bind="book.Quantity" placeholder="Số lượng" />
+    <textarea class="form-control mb-3" @bind="book.Description" placeholder="Mô tả"></textarea>
+    <InputFile OnChange="OnFileSelected" accept="image/*" />
+    <input class="form-control mb-2"
+           value="@book.ImageUrl"
+           placeholder="Hình ảnh"
+           readonly />
+ 
+  
+
+    <button type="button" class="btn btn-primary me-2" @onclick="HandleSubmit">Lưu</button>
+    <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/books"))">Hủy</button>
+</form>
+
+@code {
+    BookCreateModel book = new();
+    private string fileName;
+  
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        fileName = file.Name;
+
+      
+        book.ImageUrl = file.Name;
+    }
+    private async Task HandleSubmit()
+    {
+        await BookService.CreateBookAsync(book);
+        await JS.InvokeVoidAsync("alert", "Thêm sách thành công!");
+        Navigation.NavigateTo("/admin/books");
+    }
+}

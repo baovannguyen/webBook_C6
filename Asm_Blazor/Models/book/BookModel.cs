@@ -1,6 +1,6 @@
-﻿namespace AsmC6_API.DTOs.NewFolder
+﻿namespace Asm_Blazor.Models.book
 {
-	public class BookDto
+	public class BookModel
 	{
 		public int Id { get; set; }
 		public string Title { get; set; }
@@ -10,5 +10,6 @@
 		public string ImageUrl { get; set; }
 		public int Quantity { get; set; }
 		public string? CategoryName { get; set; }
-}
+
+	}
 }
