@@ -1,4 +1,4 @@
-﻿using AsmC6_API.DTOs.order;
+﻿using Asm_Blazor.Models.order;
 using System.Net.Http.Json;
 
 namespace Asm_Blazor.Services
@@ -13,15 +13,15 @@ namespace Asm_Blazor.Services
 		}
 
 		// Lấy danh sách đơn hàng
-		public async Task<List<OrderDto>> GetOrdersAsync()
+		public async Task<List<OrderModel>> GetOrdersAsync()
 		{
-			return await _httpClient.GetFromJsonAsync<List<OrderDto>>("api/order");
+			return await _httpClient.GetFromJsonAsync<List<OrderModel>>("api/order");
 		}
 
 		// Lấy chi tiết đơn hàng
-		public async Task<OrderDto> GetOrderByIdAsync(int orderId)
+		public async Task<OrderModel> GetOrderByIdAsync(int Id)
 		{
-			return await _httpClient.GetFromJsonAsync<OrderDto>($"api/order/{orderId}");
+			return await _httpClient.GetFromJsonAsync<OrderModel>($"api/order/{Id}");
 		}
 
 		// Cập nhật trạng thái đơn hàng

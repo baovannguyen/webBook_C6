@@ -26,6 +26,7 @@
 
     <InputFile OnChange="OnFileSelected" accept="image/*" />
     <input class="form-control mb-2" value="@book.ImageUrl" placeholder="Tên file ảnh" readonly />
+    <img style="height:100px; width:auto" src="img/@book.ImageUrl" alt="chưa chọn ảnh" class="card-img-top" />
 
     <button type="button" class="btn btn-primary me-2" @onclick="HandleSubmit">Lưu</button>
     <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/books"))">Hủy</button>

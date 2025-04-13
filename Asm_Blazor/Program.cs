@@ -11,6 +11,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<OrderService>();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7197/") });
 builder.Services.AddBlazoredLocalStorage();

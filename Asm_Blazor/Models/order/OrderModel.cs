@@ -1,6 +1,6 @@
-﻿namespace AsmC6_API.DTOs.order
+﻿namespace Asm_Blazor.Models.order
 {
-	public class OrderDto
+	public class OrderModel
 	{
 		public int Id { get; set; }
 		public int UserId { get; set; }

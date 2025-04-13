@@ -1,6 +1,8 @@
 ﻿@page "/admin/orders"
 @inject Asm_Blazor.Services.OrderService OrderService
-@using Asm_Blazor.Models.
+@inject NavigationManager NavigationManager
+@using Asm_Blazor.Models.order
+
 <h3>Order Management</h3>
 
 @if (orders == null)
@@ -24,7 +26,7 @@ else
             {
                 <tr>
                     <td>@order.Id</td>
-                    <td>@order.User?.Name</td>
+                    <td>@order.UserName</td>
                     <td>@order.Status</td>
                     <td>@order.TotalPrice.ToString("C")</td>
                     <td>
@@ -46,15 +48,14 @@ else
         orders = await OrderService.GetOrdersAsync();
     }
 
-    private async Task ShowOrderDetails(int orderId)
+    private void ShowOrderDetails(int Id)
     {
-        var order = await OrderService.GetOrderByIdAsync(orderId);
-        // Show the order details in a dialog or navigate to a detail page.
+        NavigationManager.NavigateTo($"/admin/orders/details/{Id}");
     }
 
     private async Task UpdateOrderStatus(int orderId)
     {
-        var newStatus = "Completed"; // You can make this dynamic or prompt the user for input
+        var newStatus = "ĐÃ XÁC NHẬN";
         var success = await OrderService.UpdateOrderStatusAsync(orderId, newStatus);
         if (success)
         {
