@@ -1,0 +1,94 @@
+﻿@page "/admin/users/edit/{id}"
+@inject Asm_Blazor.Services.UserService UserService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@using Asm_Blazor.Models
+
+<h3>✏️ Chỉnh sửa người dùng</h3>
+
+@if (user == null)
+{
+    <p>Đang tải...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Họ tên</label>
+        <input class="form-control" @bind="user.FullName" />
+    </div>
+
+    <div class="mb-3">
+        <label>Tên đăng nhập</label>
+        <input class="form-control" @bind="user.Username" />
+    </div>
+
+    <select class="form-select mb-2" @bind="user.Role">
+        <option value="">-- Chọn Vai trò --</option>
+        <option value="Customer">Khách Hàng</option>
+        <option value="Admin">Quản trị viên</option>
+        <option value="Staff">Nhân viên</option>
+    </select>
+
+    <div class="mb-3">
+        <label>Số điện thoại</label>
+        <input class="form-control" @bind="user.PhoneNumber" />
+    </div>
+
+    <div class="mb-3">
+        <label>Ngày sinh</label>
+
+        <div class="mb-2">
+            <InputDate @bind-Value="user.DateOfBirth" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Địa chỉ</label>
+        <input class="form-control" @bind="user.Address" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="HandleUpdate">Cập nhật</button>
+}
+
+@code {
+    [Parameter] public string? id { get; set; }
+    private UserModel? user;
+    private string? formattedDate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(id))
+        {
+            user = await UserService.GetUserByIdAsync(id);
+
+            if (user?.DateOfBirth != null)
+            {
+                formattedDate = user.DateOfBirth?.ToString("yyyy-MM-dd");
+            }
+        }
+    }
+
+    private void OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out DateTime date))
+        {
+            user!.DateOfBirth = date;
+        }
+    }
+
+    private async Task HandleUpdate()
+    {
+        if (user == null) return;
+
+        var result = await UserService.UpdateUserAsync(user);
+        if (result)
+        {
+            await JS.InvokeVoidAsync("alert", "✅ Cập nhật thành công!");
+            Navigation.NavigateTo("/admin/users");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "❌ Cập nhật thất bại!");
+        }
+    }
+}

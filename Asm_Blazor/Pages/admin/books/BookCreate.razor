@@ -1,46 +1,68 @@
 ﻿@page "/admin/books/create"
 @inject Asm_Blazor.Services.BookService BookService
+@inject CategoryService CategoryService
 @inject NavigationManager Navigation
-@using Asm_Blazor.Models.book;
 @inject IJSRuntime JS
+@using Asm_Blazor.Models.book
+@using Asm_Blazor.Models
+
 <h3>➕ Thêm Sách</h3>
 
 <form>
     <input class="form-control mb-2" @bind="book.Title" placeholder="Tiêu đề" />
     <input class="form-control mb-2" @bind="book.Author" placeholder="Tác giả" />
-    <input class="form-control mb-2" @bind="book.CategoryId" placeholder="Thể Loại" />
+
+    <select class="form-select mb-2" @bind="book.CategoryId">
+        <option value="">-- Chọn danh mục --</option>
+        @foreach (var category in categories)
+        {
+            <option value="@category.Id">@category.Name</option>
+        }
+    </select>
+
     <input type="number" class="form-control mb-2" @bind="book.Price" placeholder="Giá" />
     <input type="number" class="form-control mb-2" @bind="book.Quantity" placeholder="Số lượng" />
     <textarea class="form-control mb-3" @bind="book.Description" placeholder="Mô tả"></textarea>
+
     <InputFile OnChange="OnFileSelected" accept="image/*" />
-    <input class="form-control mb-2"
-           value="@book.ImageUrl"
-           placeholder="Hình ảnh"
-           readonly />
- 
-  
+    <input class="form-control mb-2" value="@book.ImageUrl" placeholder="Tên file ảnh" readonly />
 
     <button type="button" class="btn btn-primary me-2" @onclick="HandleSubmit">Lưu</button>
     <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/books"))">Hủy</button>
+
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success mt-3">@successMessage</div>
+    }
 </form>
 
 @code {
     BookCreateModel book = new();
-    private string fileName;
-  
+    private List<CategoryModel> categories = new();
+    private string? successMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetCategoriesAsync();
+    }
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
-        fileName = file.Name;
-
-      
         book.ImageUrl = file.Name;
     }
+
     private async Task HandleSubmit()
     {
+        if (string.IsNullOrEmpty(book.Title) || book.CategoryId == 0)
+        {
+            await JS.InvokeVoidAsync("alert", "Vui lòng nhập đầy đủ thông tin!");
+            return;
+        }
+
         await BookService.CreateBookAsync(book);
-        await JS.InvokeVoidAsync("alert", "Thêm sách thành công!");
+        successMessage = "Thêm sách thành công!";
+        await JS.InvokeVoidAsync("alert", successMessage);
         Navigation.NavigateTo("/admin/books");
     }
 }

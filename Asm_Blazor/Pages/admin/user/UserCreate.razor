@@ -1,0 +1,69 @@
+﻿@page "/admin/users/create"
+@inject Asm_Blazor.Services.UserService UserService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@using Asm_Blazor.Models
+
+<h3>➕ Thêm người dùng</h3>
+
+<div class="mb-3">
+    <label>Họ tên</label>
+    <input class="form-control" @bind="user.FullName" placeholder="Họ tên" />
+</div>
+
+<div class="mb-3">
+    <label>Tên đăng nhập</label>
+    <input class="form-control" @bind="user.Username" placeholder="Tên đăng nhập" />
+</div>
+
+<div class="mb-3">
+    <label>Mật Khẩu</label>
+    <input class="form-control" type="password" @bind="user.Password" placeholder="..............." />
+</div>
+
+
+<select class="form-select mb-2" @bind="user.Role">
+    <option value="">-- Chọn Vai trò --</option>
+        <option value="Customer">Khách Hàng</option>
+    <option value="Admin">Quản trị viên</option>
+    <option value="Staff">Nhân viên</option>
+</select>
+<div class="mb-3">
+    <label>Số điện thoại</label>
+    <input class="form-control" @bind="user.PhoneNumber" placeholder="SĐT" />
+</div>
+
+<div class="mb-3">
+    <label>Ngày sinh</label>
+
+    <div class="mb-2">
+        <InputDate @bind-Value="user.DateOfBirth" class="form-control" />
+    </div>
+</div>
+
+<div class="mb-3">
+    <label>Địa chỉ</label>
+    <input class="form-control" @bind="user.Address" placeholder="Địa chỉ" />
+</div>
+
+<button class="btn btn-success me-2" @onclick="HandleCreate">Lưu</button>
+<button class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/users"))">Hủy</button>
+
+@code {
+    private UserCreateModel user = new();
+ 
+
+    private async Task HandleCreate()
+    {
+        var result = await UserService.CreateUserAsync(user);
+        if (result)
+        {
+            await JS.InvokeVoidAsync("alert", "✅ Thêm người dùng thành công!");
+            Navigation.NavigateTo("/admin/users");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "❌ Thêm thất bại!");
+        }
+    }
+}

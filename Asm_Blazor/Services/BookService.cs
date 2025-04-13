@@ -10,6 +10,7 @@ namespace Asm_Blazor.Services
 		{
 			_http = http;
 		}
+	
 
 		public async Task<List<BookModel>> GetBooksAsync()
 			=> await _http.GetFromJsonAsync<List<BookModel>>("api/book");
