@@ -1,0 +1,62 @@
+﻿@page "/book/{Id:int}"
+@inject Asm_Blazor.Services.BookService BookService
+@inject Asm_Blazor.Services.CartService CartService
+@inject NavigationManager Nav
+@using Asm_Blazor.Models.book
+@using Asm_Blazor.Models
+@inject HttpClient Http
+
+<h3>Chi tiết sách</h3>
+
+@if (book == null)
+{
+    <p>Đang tải thông tin sách...</p>
+}
+else
+{
+    <div class="card shadow p-4">
+        <h4>@book.Title</h4>
+        <p><strong>Tác giả:</strong> @book.Author</p>
+        <p><strong>Giá:</strong> @book.Price.ToString("N0") VND</p>
+        <p><strong>Số lượng còn lại:</strong> @book.Quantity</p>
+        <p><strong>Mô tả:</strong> @book.Description</p>
+        <div class="mb-2">
+            <label for="quantity"><strong>Số lượng muốn mua:</strong></label>
+            <input type="number" id="quantity" class="form-control w-25" @bind="quantity" min="1" max="@book.Quantity" />
+        </div>
+
+        <button class="btn btn-primary" @onclick="() => AddToCart(book)">🛒 Thêm vào giỏ</button>
+
+        <button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/"))">Quay lại</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    public int quantity { get; set; } = 1;  // Default quantity is 1
+    private BookUpdateModel? book;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Lấy sách theo Id từ API
+        book = await BookService.GetBookByIdAsync(Id);
+    }
+
+    private async Task AddToCart(BookUpdateModel book)
+    {
+        // Tạo đối tượng item với thông tin từ book
+        var item = new CartItemModel
+        {
+            BookId = book.Id,
+            Title = book.Title,
+            Price = book.Price,
+				ImageUrl = book.ImageUrl,
+            Quantity = quantity
+        };
+
+        // Thêm item vào giỏ hàng qua CartService
+        await CartService.AddItemAsync(item);
+        // Điều hướng đến trang giỏ hàng
+        Nav.NavigateTo("/cart");
+    }
+}

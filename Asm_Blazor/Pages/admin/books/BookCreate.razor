@@ -1,4 +1,5 @@
 ﻿@page "/admin/books/create"
+@layout AdminLayout
 @inject Asm_Blazor.Services.BookService BookService
 @inject CategoryService CategoryService
 @inject NavigationManager Navigation
@@ -9,10 +10,10 @@
 <h3>➕ Thêm Sách</h3>
 
 <form>
-    <input class="form-control mb-2" @bind="book.Title" placeholder="Tiêu đề" />
-    <input class="form-control mb-2" @bind="book.Author" placeholder="Tác giả" />
+    <input class="form-control mb-3" @bind="book.Title" placeholder="Tiêu đề" />
+    <input class="form-control mb-3" @bind="book.Author" placeholder="Tác giả" />
 
-    <select class="form-select mb-2" @bind="book.CategoryId">
+    <select class="form-select mb-3" @bind="book.CategoryId">
         <option value="">-- Chọn danh mục --</option>
         @foreach (var category in categories)
         {
@@ -20,16 +21,20 @@
         }
     </select>
 
-    <input type="number" class="form-control mb-2" @bind="book.Price" placeholder="Giá" />
-    <input type="number" class="form-control mb-2" @bind="book.Quantity" placeholder="Số lượng" />
+    <input type="number" class="form-control mb-3" @bind="book.Price" placeholder="Giá" />
+    <input type="number" class="form-control mb-3" @bind="book.Quantity" placeholder="Số lượng" />
     <textarea class="form-control mb-3" @bind="book.Description" placeholder="Mô tả"></textarea>
 
     <InputFile OnChange="OnFileSelected" accept="image/*" />
-    <input class="form-control mb-2" value="@book.ImageUrl" placeholder="Tên file ảnh" readonly />
-    <img style="height:100px; width:auto" src="img/@book.ImageUrl" alt="chưa chọn ảnh" class="card-img-top" />
+    <input class="form-control mb-3" value="@book.ImageUrl" placeholder="Tên file ảnh" readonly />
 
-    <button type="button" class="btn btn-primary me-2" @onclick="HandleSubmit">Lưu</button>
-    <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/books"))">Hủy</button>
+    <!-- Hiển thị ảnh nếu đã chọn -->
+    <img class="card-img-top mb-3" style="height:100px; width:auto" src="img/@book.ImageUrl" alt="chưa chọn ảnh" />
+
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-primary me-2" @onclick="HandleSubmit">Lưu</button>
+        <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/books"))">Hủy</button>
+    </div>
 
     @if (!string.IsNullOrEmpty(successMessage))
     {

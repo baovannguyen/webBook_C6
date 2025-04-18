@@ -1,5 +1,6 @@
 ﻿using Asm_Blazor.Models.order;
 using System.Net.Http.Json;
+using static System.Net.WebRequestMethods;
 
 namespace Asm_Blazor.Services
 {
@@ -12,6 +13,12 @@ namespace Asm_Blazor.Services
 			_httpClient = httpClient;
 		}
 
+
+		public async Task<bool> CreateOrderAsync(OrderCreateModel order)
+		{
+			var response = await _httpClient.PostAsJsonAsync("https://localhost:7197/api/order", order);
+			return response.IsSuccessStatusCode;
+		}
 		// Lấy danh sách đơn hàng
 		public async Task<List<OrderModel>> GetOrdersAsync()
 		{

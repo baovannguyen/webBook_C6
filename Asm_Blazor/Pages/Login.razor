@@ -3,21 +3,35 @@
 @inject NavigationManager Nav
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject Asm_Blazor.Services.AuthService AuthService
+@inject IJSRuntime JS
 
-<h3>Đăng nhập</h3>
+<h3 class="text-center mb-4">🔐 Đăng Nhập</h3>
 
-<EditForm Model="model" OnValidSubmit="Login1">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <InputText @bind-Value="model.Username" placeholder="Username" class="form-control mb-2" />
-    <InputText @bind-Value="model.Password" placeholder="Mật khẩu" type="password" class="form-control mb-2" />
-    <button class="btn btn-primary">Đăng nhập</button>
-</EditForm>
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <EditForm Model="model" OnValidSubmit="Login1">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger mt-2">@errorMessage</div>
-}
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập</label>
+                <InputText @bind-Value="model.Username" class="form-control" placeholder="Nhập tên đăng nhập" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu</label>
+                <InputText @bind-Value="model.Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3 text-center">@errorMessage</div>
+        }
+    </div>
+</div>
 
 @code {
     private LoginModel model = new();
@@ -33,6 +47,7 @@
     {
         public string token { get; set; } = string.Empty;
         public string role { get; set; } = string.Empty;
+      
     }
 
     private async Task Login1()
@@ -46,24 +61,33 @@
             {
                 var loginRes = await res.Content.ReadFromJsonAsync<LoginResponse>();
 
-                await LocalStorage.SetItemAsync("authToken", loginRes.token);
-             
-                await LocalStorage.SetItemAsync("username", model.Username);
-                await LocalStorage.SetItemAsync("role", loginRes.role);
+                // Lưu token và thông tin đăng nhập vào localStorage
+                await JS.InvokeVoidAsync("sessionStorage.setItem", "authToken", loginRes.token);
+                await JS.InvokeVoidAsync("sessionStorage.setItem", "username", model.Username);
+                await JS.InvokeVoidAsync("sessionStorage.setItem", "role", loginRes.role);
+              
 
+
+                // Kiểm tra nếu Authorization header đã tồn tại, nếu có thì xóa đi
+                if (Http.DefaultRequestHeaders.Contains("Authorization"))
+                {
+                    Http.DefaultRequestHeaders.Remove("Authorization");
+                }
+
+                // Thiết lập Authorization header mới
                 Http.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", loginRes.token);
 
                 await AuthService.CheckLoginStateAsync();
 
-          
+                // Chuyển hướng dựa trên vai trò của người dùng
                 if (loginRes.role == "Admin" || loginRes.role == "Staff")
                 {
                     Nav.NavigateTo("/admin/dashboard");
                 }
                 else
                 {
-                    Nav.NavigateTo("/Home");
+                    Nav.NavigateTo("/");
                 }
             }
             else

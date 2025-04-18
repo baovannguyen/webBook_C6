@@ -12,12 +12,15 @@ namespace AsmC6_API.Data
 		public DbSet<OrderModel> Orders => Set<OrderModel>();
 		public DbSet<OrderItemModel> OrderItems => Set<OrderItemModel>();
 		public DbSet<CategoryModel> Categories => Set<CategoryModel>();
-		public DbSet<CartModel> Carts => Set<CartModel>();
-		public DbSet<CartItemModel> CartItems => Set<CartItemModel>();
+		public DbSet<CartItemModel> CartItems { get; set; }
+
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			
 
 			modelBuilder.Entity<UserModel>().HasIndex(u => u.Username).IsUnique();
 			modelBuilder.Entity<OrderItemModel>()

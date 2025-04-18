@@ -3,7 +3,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @using Asm_Blazor.Models
-
+@layout AdminLayout
 <h3>👤 Quản lý người dùng</h3>
 
 <button class="btn btn-success mb-3" @onclick="@(() => Navigation.NavigateTo("/admin/users/create"))">

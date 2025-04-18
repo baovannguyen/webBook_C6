@@ -1,0 +1,94 @@
+﻿@page "/orders"
+@inject Asm_Blazor.Services.OrderService OrderService
+@inject Asm_Blazor.Services.AuthService AuthService
+
+@using Asm_Blazor.Models.order
+
+<h3>Danh sách đơn hàng của bạn</h3>
+
+@if (orders == null)
+{
+    <p>Đang tải đơn hàng...</p>
+}
+else if (!orders.Any())
+{
+    <p>Bạn chưa có đơn hàng nào.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Ngày đặt</th>
+                <th>Trạng thái</th>
+                <th>Tổng tiền</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@order.Status</td>
+                    <td>@order.TotalPrice ₫</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" @onclick="@(() => ViewOrderDetail(order))">Xem</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedOrder != null)
+{
+    <h4>Chi tiết đơn hàng #@selectedOrder.Id</h4>
+    <p><strong>Người đặt:</strong> @selectedOrder.UserName</p>
+    <p><strong>Ngày đặt:</strong> @selectedOrder.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Trạng thái:</strong> @selectedOrder.Status</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sách</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in selectedOrder.Items)
+            {
+                <tr>
+                    <td>@item.BookTitle</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice ₫</td>
+                    <td>@(item.Quantity * item.UnitPrice) ₫</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p><strong>Tổng tiền:</strong> @selectedOrder.TotalPrice ₫</p>
+}
+@code {
+    List<OrderModel> orders = new();
+    OrderModel? selectedOrder;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await AuthService.GetUserIdAsync();
+        var allOrders = await OrderService.GetOrdersAsync();
+
+        // Lọc đơn hàng theo UserId hiện tại
+        orders = allOrders.Where(o => o.UserId == userId).ToList();
+    }
+
+    void ViewOrderDetail(OrderModel order)
+    {
+        selectedOrder = order;
+    }
+}

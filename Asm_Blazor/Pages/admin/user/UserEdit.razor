@@ -3,7 +3,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @using Asm_Blazor.Models
-
+@layout AdminLayout
 <h3>✏️ Chỉnh sửa người dùng</h3>
 
 @if (user == null)
@@ -51,7 +51,7 @@ else
 }
 
 @code {
-    [Parameter] public string? id { get; set; }
+    [Parameter] public string id { get; set; }
     private UserModel? user;
     private string? formattedDate;
 

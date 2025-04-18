@@ -6,7 +6,7 @@
 		public int UserId { get; set; }
 		public string? UserName { get; set; } // Chỉ lấy tên user
 		public DateTime OrderDate { get; set; }
-		public string Status { get; set; } = "Pending";
+		public string Status { get; set; } 
 		public decimal TotalPrice { get; set; }
 
 		public List<OrderItemModel> Items { get; set; } = new();

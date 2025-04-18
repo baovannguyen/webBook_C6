@@ -71,6 +71,9 @@ namespace AsmC6_API.Controllers
 
 			return Ok(_mapper.Map<BookGetUpdateDto>(book));
 		}
+
+	
+
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteBook(int id)
 		{

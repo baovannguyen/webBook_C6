@@ -7,7 +7,7 @@
 		public UserModel? User { get; set; }
 		public DateTime OrderDate { get; set; } = DateTime.Now;
 		public string Status { get; set; } = "ĐÃ THANH TOÁN";
-		public decimal TotalPrice { get; set; }
+		public int TotalPrice { get; set; }
 
 		public ICollection<OrderItemModel> Items { get; set; } = new List<OrderItemModel>();
 	}

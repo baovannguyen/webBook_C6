@@ -7,7 +7,7 @@
 		public string? UserName { get; set; } // Chỉ lấy tên user
 		public DateTime OrderDate { get; set; }
 		public string Status { get; set; } = "ĐÃ THANH TOÁN";
-		public decimal TotalPrice { get; set; }
+		public int TotalPrice { get; set; }
 
 		public List<OrderItemDto> Items { get; set; } = new();
 

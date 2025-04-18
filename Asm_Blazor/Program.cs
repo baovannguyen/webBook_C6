@@ -1,6 +1,7 @@
 using Asm_Blazor;
 using Asm_Blazor.Services;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -12,6 +13,11 @@ builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<CartService>();
+
+builder.Services.AddBlazoredSessionStorage();
+
+
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7197/") });
 builder.Services.AddBlazoredLocalStorage();

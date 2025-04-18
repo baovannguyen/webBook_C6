@@ -1,0 +1,51 @@
+﻿@page "/category/{CategoryId:int}"
+@inject Asm_Blazor.Services.BookService BookService
+@inject CategoryService CategoryService
+@using Asm_Blazor.Models.book
+
+<h3 class="text-primary">Sách theo thể loại: @CategoryName</h3>
+
+@if (books == null)
+{
+    <p>Đang tải sách...</p>
+}
+else if (books.Count == 0)
+{
+    <p>Không có sách nào trong thể loại này.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        @foreach (var book in books)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="img/@book.ImageUrl" class="card-img-top" alt="@book.Title" style="height: 200px; object-fit: cover;" />
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <p class="card-text">Tác giả: @book.Author</p>
+                        <p class="card-text text-danger fw-bold">@book.Price ₫</p>
+                        <a class="btn btn-primary btn-sm w-100" href="@($"/book/{book.Id}")">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    private string? CategoryName;
+    private List<BookModel>? books;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var allBooks = await BookService.GetBooksAsync();
+        books = allBooks.Where(b => b.CategoryId == CategoryId).ToList();
+
+        var category = await CategoryService.GetCategoryByIdAsync(CategoryId);
+        CategoryName = category?.Name ?? "Không rõ";
+    }
+}
