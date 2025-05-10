@@ -1,4 +1,5 @@
 ﻿using AsmC6_API.Data;
+using AsmC6_API.DTOs.book;
 using AsmC6_API.DTOs.NewFolder;
 using AsmC6_API.Models;
 using AutoMapper;
@@ -24,14 +25,15 @@ namespace AsmC6_API.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
 		{
-			var books = await _context.Books.ToListAsync();
-			return Ok(_mapper.Map<IEnumerable<BookDto>>(books));
+
+			var books = await _context.Books.Include(b => b.Category).ToListAsync();
+			return Ok(_mapper.Map<List<BookDto>>(books));
 		}
 
 		[HttpGet("{id}")]
 		public async Task<ActionResult<BookDto>> GetBook(int id)
 		{
-			var book = await _context.Books.FindAsync(id);
+			var book = await _context.Books.Include(b => b.Category).FirstOrDefaultAsync(b => b.Id == id);
 			if (book == null)
 				return NotFound();
 
@@ -61,6 +63,16 @@ namespace AsmC6_API.Controllers
 
 			return NoContent();
 		}
+
+		[HttpGet("getupdate/{id}")]
+		public async Task<ActionResult<BookGetUpdateDto>> GetBookUpdate(int id)
+		{
+			var book = await _context.Books.FindAsync(id);
+
+			return Ok(_mapper.Map<BookGetUpdateDto>(book));
+		}
+
+	
 
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteBook(int id)

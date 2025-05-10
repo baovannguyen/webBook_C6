@@ -1,0 +1,40 @@
+﻿@page "/admin/orders/details/{Id:int}"
+@inject Asm_Blazor.Services.OrderService OrderService
+@using Asm_Blazor.Models.order
+@inject NavigationManager Navigation
+@layout AdminLayout
+<h3>Order Details</h3>
+
+@if (order == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h4>Order ID: @order.Id</h4>
+    <p><strong>User:</strong> @order.UserName</p>
+    <p><strong>Status:</strong> @order.Status</p>
+    <p><strong>Total Price:</strong> @order.TotalPrice.ToString("C")</p>
+
+    <h5>Order Items:</h5>
+    <ul>
+        @foreach (var item in order.Items)
+        {
+            <li>@item.BookTitle - Quantity: @item.Quantity - Price: @item.UnitPrice.ToString("C")</li>
+        }
+    </ul>
+
+    <hr />
+
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private OrderModel order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        order = await OrderService.GetOrderByIdAsync(Id);
+    }
+
+}

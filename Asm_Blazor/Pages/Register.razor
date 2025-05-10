@@ -1,0 +1,96 @@
+﻿@page "/register"
+@using System.IO;
+@using System.ComponentModel.DataAnnotations;
+@inject HttpClient Http
+@inject NavigationManager Nav
+<h3 class="text-center mb-4">📝 Đăng ký tài khoản</h3>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <EditForm Model="model" OnValidSubmit="RegisterUser">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label class="form-label">Họ tên</label>
+                <InputText @bind-Value="model.FullName" class="form-control" placeholder="Nhập họ tên" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập</label>
+                <InputText @bind-Value="model.Username" class="form-control" placeholder="Tên đăng nhập" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Số điện thoại</label>
+                <InputText @bind-Value="model.PhoneNumber" class="form-control" placeholder="Số điện thoại" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ngày sinh</label>
+                <InputDate @bind-Value="model.DateOfBirth" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Địa chỉ</label>
+                <InputText @bind-Value="model.Address" class="form-control" placeholder="Địa chỉ" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu</label>
+                <InputText @bind-Value="model.Password" class="form-control" placeholder="Mật khẩu" type="password" />
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+        </EditForm>
+    </div>
+</div>
+
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="text-danger mt-2">@errorMessage</div>
+}
+
+@code {
+    private RegisterModel model = new();
+    private string errorMessage = string.Empty;
+
+    public class RegisterModel
+    {
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập.")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
+        public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
+        public string FullName { get; set; } = string.Empty;
+
+        public string? PhoneNumber { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string? Address { get; set; }
+    }
+
+    private async Task RegisterUser()
+    {
+        errorMessage = string.Empty;
+        try
+        {
+            var res = await Http.PostAsJsonAsync("api/Auth/register", model);
+            if (res.IsSuccessStatusCode)
+            {
+                Nav.NavigateTo("/login");
+            }
+            else
+            {
+                var msg = await res.Content.ReadAsStringAsync();
+                errorMessage = $"Đăng ký thất bại: {msg}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Lỗi khi gửi yêu cầu đăng ký: " + ex.Message;
+        }
+    }
+}

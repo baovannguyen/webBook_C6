@@ -1,0 +1,77 @@
+﻿@page "/admin/books/edit/{Id:int}"
+@inject Asm_Blazor.Services.BookService BookService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@using Asm_Blazor.Models
+@using Asm_Blazor.Models.book
+@layout AdminLayout
+<h3>🛠️ Cập nhật Sách</h3>
+
+<form onsubmit="return false">
+    <!-- Tiêu đề sách -->
+    <input class="form-control mb-2" placeholder="Tiêu đề" @bind="book.Title" />
+
+    <!-- Tác giả sách -->
+    <input class="form-control mb-2" placeholder="Tác giả" @bind="book.Author" />
+
+    <!-- Giá sách -->
+    <input type="number" class="form-control mb-2" placeholder="Giá" @bind="book.Price" />
+
+    <!-- Thể loại sách -->
+    <input type="number" class="form-control mb-2" placeholder="Thể loại" @bind="book.CategoryId" />
+
+    <!-- Số lượng sách -->
+    <input type="number" class="form-control mb-2" placeholder="Số lượng" @bind="book.Quantity" />
+
+    <!-- Mô tả sách -->
+    <textarea class="form-control mb-3" placeholder="Mô tả" @bind="book.Description"></textarea>
+
+    <!-- Chọn ảnh cho sách -->
+    <InputFile OnChange="OnFileSelected" accept="image/*" />
+
+    <!-- Hiển thị hình ảnh đã chọn -->
+    <input class="form-control mb-2"
+           value="@book.ImageUrl"
+           placeholder="Hình ảnh"
+           readonly />
+
+    <!-- Nút lưu -->
+    <button class="btn btn-primary me-2" @onclick="HandleSubmit">Lưu</button>
+
+    <!-- Nút hủy -->
+    <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/books"))">Hủy</button>
+</form>
+
+@code {
+    [Parameter] 
+    public int Id { get; set; }
+
+    BookUpdateModel book = new();
+
+    private string fileName;
+
+   
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        fileName = file.Name;
+
+
+        book.ImageUrl = file.Name;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await BookService.GetBookByIdAsync(Id);
+        if (result != null)
+            book = result;
+        else
+            await JS.InvokeVoidAsync("alert", "Không tìm thấy sách");
+    }
+
+    async Task HandleSubmit()
+    {
+        await BookService.UpdateBookAsync(book);
+        await JS.InvokeVoidAsync("alert", "Cập nhật sách thành công!");
+        Navigation.NavigateTo("/admin/books");
+    }
+}

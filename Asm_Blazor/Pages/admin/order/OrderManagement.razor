@@ -1,0 +1,78 @@
+﻿@page "/admin/orders"
+@inject Asm_Blazor.Services.OrderService OrderService
+@inject NavigationManager NavigationManager
+@using Asm_Blazor.Models.order
+@layout AdminLayout
+<h3>Order Management</h3>
+
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Status</th>
+                <th>Total Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.UserName</td>
+                    <td>@order.Status</td>
+                    <td>@order.TotalPrice.ToString("C")</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ShowOrderDetails(order.Id)">View</button>
+                        <button class="btn btn-warning" @onclick="() => UpdateOrderStatus(order.Id)">Update Status</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteOrder(order.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<OrderModel> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await OrderService.GetOrdersAsync();
+    }
+
+    private void ShowOrderDetails(int Id)
+    {
+        NavigationManager.NavigateTo($"/admin/orders/details/{Id}");
+    }
+
+    private async Task UpdateOrderStatus(int orderId)
+    {
+        var newStatus = "ĐÃ XÁC NHẬN";
+        var success = await OrderService.UpdateOrderStatusAsync(orderId, newStatus);
+        if (success)
+        {
+            var updatedOrder = orders.FirstOrDefault(o => o.Id == orderId);
+            if (updatedOrder != null)
+            {
+                updatedOrder.Status = newStatus;
+            }
+        }
+    }
+
+    private async Task DeleteOrder(int orderId)
+    {
+        var success = await OrderService.DeleteOrderAsync(orderId);
+        if (success)
+        {
+            orders = orders.Where(o => o.Id != orderId).ToList();
+        }
+    }
+}

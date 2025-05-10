@@ -1,0 +1,15 @@
+﻿namespace Asm_Blazor.Models.order
+{
+	public class OrderItemModel
+	{/*
+		public int BookId { get; set; }
+		public int Quantity { get; set; }
+		public decimal UnitPrice { get; set; }*/
+
+
+		public int BookId { get; set; }
+		public string? BookTitle { get; set; } // Optionally show Book Title
+		public int Quantity { get; set; }
+		public decimal UnitPrice { get; set; }
+	}
+}

@@ -28,11 +28,11 @@ namespace AsmC6_API.Controllers
 			{
 				UserId = orderDto.UserId,
 				OrderDate = DateTime.Now,
-				Status = "Pending",
+				Status = "ĐÃ THANH TOÁN",
 				Items = new List<OrderItemModel>()
 			};
 
-			decimal totalPrice = 0;
+			int totalPrice = 0;
 
 			foreach (var item in orderDto.Items)
 			{
@@ -46,18 +46,16 @@ namespace AsmC6_API.Controllers
 				// Trừ tồn kho
 				book.Quantity -= item.Quantity;
 
-				// Tính đơn giá cho item
-				var unitPrice = book.Price * item.Quantity;
-				totalPrice += unitPrice;
-
+				int Price = book.Price * item.Quantity;
+				totalPrice += Price;
 				order.Items.Add(new OrderItemModel
 				{
 					BookId = item.BookId,
 					Quantity = item.Quantity,
-					UnitPrice = unitPrice
+					UnitPrice = Price	
 				});
 			}
-
+			
 			// Tổng giá đơn hàng
 			order.TotalPrice = totalPrice;
 

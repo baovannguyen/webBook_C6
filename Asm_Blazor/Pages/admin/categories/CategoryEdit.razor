@@ -1,0 +1,53 @@
+﻿@page "/admin/categories/edit/{id:int}"
+@inject CategoryService CategoryService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@using Asm_Blazor.Models
+@layout AdminLayout
+<h3>✏️ Sửa danh mục</h3>
+
+@if (category == null)
+{
+    <p>Đang tải danh mục...</p>
+}
+else
+{
+    <form>
+        <input class="form-control mb-2" @bind="category.Name" placeholder="Tên danh mục" />
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success">@successMessage</div>
+        }
+
+        <button type="button" class="btn btn-primary me-2" @onclick="HandleUpdate">Lưu</button>
+        <button type="button" class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("/admin/categories"))">Hủy</button>
+    </form>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private CategoryModel? category;
+    private string? successMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        category = await CategoryService.GetCategoryByIdAsync(id);
+    }
+
+    private async Task HandleUpdate()
+    {
+        if (string.IsNullOrWhiteSpace(category.Name))
+        {
+            await JS.InvokeVoidAsync("alert", "Tên danh mục không được để trống.");
+            return;
+        }
+       
+        await CategoryService.UpdateCategoryAsync(category);
+        successMessage = "✅ Cập nhật danh mục thành công!";
+        await Task.Delay(1000);
+        Navigation.NavigateTo("/admin/categories", true);
+
+    }
+}

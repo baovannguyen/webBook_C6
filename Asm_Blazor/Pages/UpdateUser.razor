@@ -1,0 +1,78 @@
+﻿@page "/update-user/{id}"
+@inject Asm_Blazor.Services.UserService UserService
+@inject Asm_Blazor.Services.AuthService AuthService
+@inject NavigationManager Navigation
+@using Asm_Blazor.Models
+@inject IJSRuntime JS
+
+<h3>Cập nhật thông tin người dùng</h3>
+
+@if (user == null)
+{
+    <p>Đang tải...</p>
+}
+else
+{
+    <EditForm Model="@user" OnValidSubmit="UpdateUser1">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <InputText class="form-control" @bind-Value="user.Username" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Họ tên</label>
+            <InputText class="form-control" @bind-Value="user.FullName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Số điện thoại</label>
+            <InputText class="form-control" @bind-Value="user.PhoneNumber" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Ngày sinh</label>
+            <InputDate class="form-control" @bind-Value="user.DateOfBirth" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Địa chỉ</label>
+            <InputText class="form-control" @bind-Value="user.Address" />
+        </div>
+
+        <!-- Role không hiển thị và không được cập nhật -->
+
+        <button class="btn btn-primary" type="submit">Cập nhật</button>
+        <button class="btn btn-secondary ms-2" @onclick="@(() => Navigation.NavigateTo("/"))">Quay lại</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public string id { get; set; }
+    private UserModel? user;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(id))
+        {
+            user = await UserService.GetUserByIdAsync(id);
+        }
+    }
+
+    private async Task UpdateUser1()
+    {
+        var result = await UserService.UpdateUserAsync(user!);
+        if (result)
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thành công");
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Cập nhật thất bại");
+        }
+    }
+}

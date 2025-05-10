@@ -1,39 +1,144 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject NavigationManager Nav
+@inject Asm_Blazor.Services.AuthService AuthService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@using Asm_Blazor.Models
+<style>
+    .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0; /* để không bị lệch */
+    }
+
+   
+</style>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Asm_Blazor</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/img/logo.png" alt="Logo" class="me-2" width="100" height="100" />
+
+        </a>
+
+        <!-- Toggle button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-    </div>
-</div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+        <!-- Menu -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li></li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/">Trang chủ</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/">Sách mới</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/">Khuyến mãi</NavLink>
+                </li>
+                <li class="nav-item dropdown" @onmouseover="LoadCategories">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Thể loại
+                    </a>
+                    <ul class="dropdown-menu">
+                        @if (categories != null)
+                        {
+                            @foreach (var category in categories)
+                            {
+                                <li>
+                                    <a class="dropdown-item" href="@($"/category/{category.Id}")">@category.Name</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li><span class="dropdown-item text-muted">Đang tải...</span></li>
+                        }
+                    </ul>
+                </li>
+
+            </ul>
+
+            <!-- Góc phải: Giỏ hàng + User -->
+            <ul class="navbar-nav ms-auto align-items-center gap-3 " style="margin-right:40px">
+                <li class="nav-item cart-icon position-relative">
+                    <a href="/cart" class="text-white">
+                        <i class="bi bi-cart3 fs-4"></i>
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-circle">0</span>
+                    </a>
+                </li>
+
+                @if (AuthService.IsLoggedIn)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button">
+                            👋 @username
+                        </a>
+
+                        <ul class="dropdown-menu show-on-hover" aria-labelledby="userDropdown">
+                            <li>
+                                <NavLink class="dropdown-item" href="/orders">Đơn hàng của tôi</NavLink>
+                            </li>
+                            <li>
+                                <NavLink class="dropdown-item" href="@($"/update-user/{id}")">
+                                    <span class="oi oi-pencil" aria-hidden="true"></span> Cập nhật tài khoản
+                                </NavLink>
+                            </li>
+                            <li>
+                                <button class="dropdown-item text-danger" @onclick="Logout">Đăng xuất</button>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item"><NavLink class="nav-link" href="/register">Đăng ký</NavLink></li>
+                    <li class="nav-item"><NavLink class="nav-link" href="/login">Đăng nhập</NavLink></li>
+                }
+            </ul>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    </div>
+</nav>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 @code {
+    private string? username;
+    private int? id;
     private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
-    private void ToggleNavMenu()
+    private async Task Logout()
     {
-        collapseNavMenu = !collapseNavMenu;
+        await AuthService.LogoutAsync();
+
+        Nav.NavigateTo("/login", true);
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.CheckLoginStateAsync();
+        username = await sessionStorage.GetItemAsync<string>("username");
+         id = await AuthService.GetUserIdAsync();
+
+    }
+
+
+    //thể loại
+    @inject CategoryService CategoryService
+
+    @code {
+        private List<CategoryModel>? categories;
+
+        private async Task LoadCategories()
+        {
+            if (categories == null || categories.Count == 0)
+            {
+                categories = await CategoryService.GetCategoriesAsync();
+            }
+        }
+    }
+
 }

@@ -1,0 +1,57 @@
+﻿@page "/admin/categories"
+@inject CategoryService CategoryService
+@inject NavigationManager Navigation
+@using Asm_Blazor.Models
+@layout AdminLayout
+
+<h3>Quản lý Danh mục</h3>
+
+<button class="btn btn-primary mb-2" @onclick="@(()=> Navigation.NavigateTo("/admin/categories/create"))">Thêm danh mục</button>
+
+@if (categories == null)
+{
+    <p>Đang tải...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Tên danh mục</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in categories)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-2" @onclick="() => Edit(item.Id)">Sửa</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(item.Id)">Xóa</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<CategoryModel>? categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetCategoriesAsync();
+    }
+
+    void Edit(int id)
+    {
+        Navigation.NavigateTo($"/admin/categories/edit/{id}");
+    }
+
+    async Task Delete(int id)
+    {
+        await CategoryService.DeleteCategoryAsync(id);
+        categories = await CategoryService.GetCategoriesAsync();
+    }
+}
